@@ -50,6 +50,35 @@
     <link rel="stylesheet" href="styles/styles.css" type="text/css" media="screen">
 </head>
 <body>
+    <div id="content" class="container">
+        <div class="section grid grid5 s3">
+            <h2>Amazon S3 Buckets:</h2>
+            <ul>
+            <% for (Bucket bucket : s3.listBuckets()) { %>
+               <li> <%= bucket.getName() %> </li>
+            <% } %>
+            </ul>
+        </div>
 
+        <div class="section grid grid5 sdb">
+            <h2>Amazon DynamoDB Tables:</h2>
+            <ul>
+            <% for (String tableName : dynamo.listTables().getTableNames()) { %>
+               <li> <%= tableName %></li>
+            <% } %>
+            </ul>
+        </div>
+
+        <div class="section grid grid5 gridlast ec2">
+            <h2>Amazon EC2 Instances:</h2>
+            <ul>
+            <% for (Reservation reservation : ec2.describeInstances().getReservations()) { %>
+                <% for (Instance instance : reservation.getInstances()) { %>
+                   <li> <%= instance.getInstanceId() %></li>
+                <% } %>
+            <% } %>
+            </ul>
+        </div>
+    </div>
 </body>
 </html>

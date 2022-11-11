@@ -1,7 +1,7 @@
 # ComS-CprE-559
 Fall 2022 - Term Project Proposal
 
-Step 1 on install Eclipse. It is important that you install Eclipse IDE for Enterprise Java and Web Developers
+Step 1 on install Eclipse. It is important that you install Eclipse IDE for Enterprise Java and Web Developers \n
 Step 2 download apache-tomcat-10.0.27 and add it to the server list
 Step 3 launch web page with the tomcat server
 

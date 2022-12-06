@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
-Built-By: rauch
-Build-Jdk: 17.0.5
+Build-Jdk-Spec: 17
+Implementation-Title: samples
+Implementation-Version: 1.0.0
 Created-By: Maven Integration for Eclipse
 

@@ -77,10 +77,10 @@ public class Interface {
 		return "User not found";
 	}
 	
-	//@RequestBody String awsAccessKeyId,@RequestBody String awsSecretAccessKey,@RequestBody String region
 	@PostMapping(path="/login", consumes="application/json", produces="application/json")
 	public String EC2Creator(@RequestBody CCCredentials credentials) { //Region example: us-east-2
 		SHAHash Hash = new SHAHash();
+		System.out.printf(credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
 		String ID = Hash.generateSHAHash(credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
 		Client newUser = new Client(ID,credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
 

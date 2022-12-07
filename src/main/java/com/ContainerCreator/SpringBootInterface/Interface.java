@@ -79,11 +79,7 @@ public class Interface {
 	
 	@PostMapping(path="/login", consumes="application/json", produces="application/json")
 	public String EC2Creator(@RequestBody CCCredentials credentials) { //Region example: us-east-2
-		try {
-			System.out.printf(credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
-		} catch (Exception e) {
-			System.out.println(e.toString());
-		}
+		JSONObject response = new JSONObject();
 		SHAHash Hash = new SHAHash();
 		String ID = Hash.generateSHAHash(credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
 		Client newUser = new Client(ID,credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
@@ -93,11 +89,11 @@ public class Interface {
 				repository.save(newUser);
 			} catch (Exception e) {
 				System.out.println(e.toString());
+				response.put("Error", e.toString());
+				return response.toString();
 			}
 			
 		}
-		
-		JSONObject response = new JSONObject();
 		response.put("id", ID);
 		return response.toString();
 	}

@@ -82,7 +82,7 @@ public class Interface {
 		try {
 			System.out.printf(credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
 		} catch (Exception e) {
-			// TODO: handle exception
+			System.out.println(e.toString());
 		}
 		SHAHash Hash = new SHAHash();
 		String ID = Hash.generateSHAHash(credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());

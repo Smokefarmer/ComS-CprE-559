@@ -100,7 +100,7 @@ public class Interface {
 	
 	@PostMapping(path="/createEC2/{id}", consumes="application/json", produces="application/json")
 	public String CreateEC2(@PathVariable String id, @RequestBody EC2Instance instanceInformation) { 
-		
+		JSONObject response = new JSONObject();
 		Client user = null;
 		try {
 			user = repository.findById(id).get();
@@ -108,7 +108,8 @@ public class Interface {
 			return creator.createEC2(instanceInformation);
 		} catch (Exception e) {
 			System.out.println(e);
-			return "User not found";
+			response.put("Error", e.toString());
+			return response.toString();
 		}
 		
 		/*
@@ -209,6 +210,7 @@ public class Interface {
 	
 	@PostMapping(path="/createBucket/{id}", consumes="application/json", produces="application/json")
 	public String createBucket(@PathVariable String id, @RequestBody S3Instance bucketInformation) {
+		JSONObject response = new JSONObject();
 		Client user = null;
 		try {
 			user = repository.findById(id).get();
@@ -216,7 +218,8 @@ public class Interface {
 			return creator.createBucket(bucketInformation.getBucketName());
 		} catch (Exception e) {
 			System.out.println(e);
-			return "User not found";
+			response.put("id", e.toString());
+			return response.toString();
 		}
 		
 	}

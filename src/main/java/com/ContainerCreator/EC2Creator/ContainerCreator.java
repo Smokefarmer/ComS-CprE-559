@@ -325,7 +325,7 @@ public class ContainerCreator {
 		
 		DescribeInstancesRequest request = new DescribeInstancesRequest();
 		while(!done) {
-			
+			JSONArray JSONarray = new JSONArray();
 		    DescribeInstancesResult response = ec2.describeInstances(request);
 		    
 		    for(Reservation reservation : response.getReservations()) {
@@ -339,9 +339,9 @@ public class ContainerCreator {
 		        	JSONinstance.put("Monitoring State", instance.getMonitoring().getState().toString());
 		            count++;
 		        }
-		        instanceResponse.put("Instance" + count, JSONinstance);
+		        JSONarray.add(JSONinstance);
 		    }
-	
+		    instanceResponse.put("Instances",JSONarray);
 		    request.setNextToken(response.getNextToken());
 	
 		    if(response.getNextToken() == null) {

@@ -53,6 +53,7 @@ import com.ContainerCreator.S3Ceator.S3BucketCreator;
 //https://spring.io/guides/tutorials/rest/
 
 @RestController
+@CrossOrigin
 public class Interface {
 
 	private UserRepository repository;
@@ -62,7 +63,6 @@ public class Interface {
 	  }
 	
 	@GetMapping("/")
-	@CrossOrigin(origins = "http://localhost:8080")
 	public String index() {
 		return "Greetings from Container Creator!";
 	}

@@ -225,11 +225,11 @@ public class Interface {
 		
 	}
 
-	@GetMapping(path="/getALLBuckets/{id}", produces="application/json")
-	public String listBuckets(@PathVariable String id) {
+	@PostMapping(path="/getALLBuckets", produces="application/json")
+	public String listBuckets(@RequestBody Requestinformation instanceInformation) {
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(instanceInformation.getID()).get();
 			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			return creator.listBuckets();
 		} catch (Exception e) {

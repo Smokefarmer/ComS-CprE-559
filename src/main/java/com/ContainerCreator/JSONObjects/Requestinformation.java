@@ -1,6 +1,6 @@
 package com.ContainerCreator.JSONObjects;
 
-public class EC2Instance {
+public class Requestinformation {
 	
 	private String ID;
 	private String keyName;
@@ -9,7 +9,7 @@ public class EC2Instance {
 	private String instanceTyp;
 	private Boolean WebServer;
 	private Boolean SSH;
-	public EC2Instance(String ID, String keyName, String securityGroupName, String ImageID, String instanceTyp,
+	public Requestinformation(String ID, String keyName, String securityGroupName, String ImageID, String instanceTyp,
 			Boolean WebServer, Boolean SSH) {
 		this.ID = ID;
 		this.keyName = keyName;
@@ -19,7 +19,7 @@ public class EC2Instance {
 		this.WebServer = WebServer;
 		this.SSH = SSH;
 	}
-	public String getinstanceID() {
+	public String getID() {
 		return ID;
 	}
 	public void setinstanceID(String instanceID) {

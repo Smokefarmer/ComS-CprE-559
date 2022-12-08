@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.ContainerCreator.JSONObjects.EC2Instance;
+import com.ContainerCreator.JSONObjects.Requestinformation;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -86,7 +86,7 @@ public class ContainerCreator {
 			}
 	}
 
-	public String createEC2(EC2Instance instanceInformation) {
+	public String createEC2(Requestinformation instanceInformation) {
 //Source: https://www.edureka.co/community/36250/launching-an-ec2-instance-using-aws-sdk-java
 		String keyName  = instanceInformation.getKeyName();
 		JSONObject instanceResponse = new JSONObject();

@@ -46,7 +46,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.ContainerCreator.EC2Creator.ContainerCreator;
 import com.ContainerCreator.EC2Creator.Client;
 import com.ContainerCreator.JSONObjects.CCCredentials;
-import com.ContainerCreator.JSONObjects.EC2Instance;
+import com.ContainerCreator.JSONObjects.Requestinformation;
 import com.ContainerCreator.JSONObjects.S3Instance;
 import com.ContainerCreator.S3Ceator.S3BucketCreator;
 
@@ -80,6 +80,7 @@ public class Interface {
 	@PostMapping(path="/login", consumes="application/json", produces="application/json")
 	public String EC2Creator(@RequestBody CCCredentials credentials) { //Region example: us-east-2
 		JSONObject response = new JSONObject();
+		
 		SHAHash Hash = new SHAHash();
 		String ID = Hash.generateSHAHash(credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
 		Client newUser = new Client(ID,credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
@@ -99,7 +100,7 @@ public class Interface {
 	}
 	
 	@PostMapping(path="/createEC2/{id}", consumes="application/json", produces="application/json")
-	public String CreateEC2(@PathVariable String id, @RequestBody EC2Instance instanceInformation) { 
+	public String CreateEC2(@PathVariable String id, @RequestBody Requestinformation instanceInformation) { 
 		JSONObject response = new JSONObject();
 		Client user = null;
 		try {
@@ -156,12 +157,12 @@ public class Interface {
 	}
 	
 	@PostMapping(path="/deleteEC2/{id}", consumes="application/json", produces="application/json")
-	public String deleteInstance(@PathVariable String id, @RequestBody EC2Instance instanceInformation) {
+	public String deleteInstance(@PathVariable String id, @RequestBody Requestinformation instanceInformation) {
 		Client user = null;
 		try {
 			user = repository.findById(id).get();
 			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
-			return creator.deleteInstance(instanceInformation.getinstanceID());
+			return creator.deleteInstance(instanceInformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
 			return "User not found";
@@ -169,12 +170,12 @@ public class Interface {
 	}
 
 	@PostMapping(path="/stopEC2/{id}", consumes="application/json", produces="application/json")
-	public String  stopInstance(@PathVariable String id, @RequestBody EC2Instance instanceInformation) {
+	public String  stopInstance(@PathVariable String id, @RequestBody Requestinformation instanceInformation) {
 		Client user = null;
 		try {
 			user = repository.findById(id).get();
 			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
-			return creator.stopInstance(instanceInformation.getinstanceID());
+			return creator.stopInstance(instanceInformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
 			return "User not found";
@@ -183,12 +184,12 @@ public class Interface {
 	}
 
 	@PostMapping(path="/startEC2/{id}", consumes="application/json", produces="application/json")
-	public String startIntance(@PathVariable String id, @RequestBody EC2Instance instanceInformation) {
+	public String startIntance(@PathVariable String id, @RequestBody Requestinformation instanceInformation) {
 		Client user = null;
 		try {
 			user = repository.findById(id).get();
 			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
-			return creator.startIntance(instanceInformation.getinstanceID());
+			return creator.startIntance(instanceInformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
 			return "User not found";
@@ -196,12 +197,12 @@ public class Interface {
 	}
 
 	@PostMapping(path="/rebootEC2/{id}", consumes="application/json", produces="application/json")
-	public String rebootIntance(@PathVariable String id, @RequestBody EC2Instance instanceInformation) {
+	public String rebootIntance(@PathVariable String id, @RequestBody Requestinformation instanceInformation) {
 		Client user = null;
 		try {
 			user = repository.findById(id).get();
 			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
-			return creator.rebootIntance(instanceInformation.getinstanceID());
+			return creator.rebootIntance(instanceInformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
 			return "User not found";
@@ -339,16 +340,24 @@ public class Interface {
 	
 	@PostMapping(path="/copyObject/{id}",consumes="application/json", produces="application/json")
 	public String CopyingRenamingMovingObject(@PathVariable String id, @RequestBody S3Instance bucketInformation) { //String sourceBucketName, String objectPathInSource, String destinationBucketName, String objectPathInDestination) {
-		System.out.println(bucketInformation.getSourceBucketName());
-		System.out.println(bucketInformation.getObjectPathInSource());
-		System.out.println(bucketInformation.getDestinationBucketName());
-		System.out.println(bucketInformation.getDestinationBucketName());
-		
 		Client user = null;
 		try {
 			user = repository.findById(id).get();
 			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			return creator.CopyObjects(bucketInformation.getSourceBucketName(), bucketInformation.getObjectPathInSource(), bucketInformation.getDestinationBucketName(), bucketInformation.getObjectPathInDestination());
+		} catch (Exception e) {
+			System.out.println(e);
+			return e.toString();
+		}
+	}
+	
+	@PostMapping(path="/logoff",consumes="application/json", produces="application/json")
+	public String logOff( @RequestBody Requestinformation requestinforamtion) { //String sourceBucketName, String objectPathInSource, String destinationBucketName, String objectPathInDestination) {
+		JSONObject response = new JSONObject();
+		try {
+			repository.deleteById(requestinforamtion.getID());
+			response.put("Delete", "True");
+			return response.toString();
 		} catch (Exception e) {
 			System.out.println(e);
 			return e.toString();

@@ -84,6 +84,8 @@ public class Interface {
 		SHAHash Hash = new SHAHash();
 		String ID = Hash.generateSHAHash(credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
 		Client newUser = new Client(ID,credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
+		
+		
 
 		if(repository.findById(ID).isEmpty()) {
 			try {
@@ -135,7 +137,7 @@ public class Interface {
 		 */
 	}
 	
-	@GetMapping(path="/getALLInstances", produces="application/json")
+	@PostMapping(path="/getALLInstances", produces="application/json")
 	public String getAllInstances(@RequestBody Requestinformation requestinformation) {
 		Client user = null;
 		try {

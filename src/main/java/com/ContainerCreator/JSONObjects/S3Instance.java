@@ -4,17 +4,19 @@ import java.io.File;
 
 public class S3Instance {
 	private String bucketName;
+	private String ClientID;
 	private String Path;
 	private String sourceBucketName;
 	private String objectPathInSource; 
 	private String destinationBucketName;
 	private String objectPathInDestination;
 	private String Objects[];
-	public S3Instance(String bucketName, String Path, String sourceBucketName, String objectPathInSource,
+	public S3Instance(String ClientID, String bucketName, String Path, String sourceBucketName, String objectPathInSource,
 			String destinationBucketName, String objectPathInDestination, String[] Objects) {
 		super();
 		this.bucketName = bucketName;
 		this.Path = Path;
+		this.ClientID = ClientID;
 		this.sourceBucketName = sourceBucketName;
 		this.objectPathInSource = objectPathInSource;
 		this.destinationBucketName = destinationBucketName;
@@ -23,6 +25,9 @@ public class S3Instance {
 	}
 	public String getBucketName() {
 		return bucketName;
+	}
+	public String getClientID() {
+		return ClientID;
 	}
 	public void setBucketName(String bucketName) {
 		this.bucketName = bucketName;

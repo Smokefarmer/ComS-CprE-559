@@ -99,14 +99,14 @@ public class Interface {
 		return response.toString();
 	}
 	
-	@PostMapping(path="/createEC2/{id}", consumes="application/json", produces="application/json")
-	public String CreateEC2(@PathVariable String id, @RequestBody Requestinformation instanceInformation) { 
+	@PostMapping(path="/createEC2", consumes="application/json", produces="application/json")
+	public String CreateEC2(@RequestBody Requestinformation requestinformation) { 
 		JSONObject response = new JSONObject();
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(requestinformation.getClientID()).get();
 			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
-			return creator.createEC2(instanceInformation);
+			return creator.createEC2(requestinformation);
 		} catch (Exception e) {
 			System.out.println(e);
 			response.put("Error", e.toString());
@@ -135,11 +135,11 @@ public class Interface {
 		 */
 	}
 	
-	@GetMapping(path="/getALLInstances/{id}", produces="application/json")
-	public String getAllInstances(@PathVariable String id) {
+	@GetMapping(path="/getALLInstances", produces="application/json")
+	public String getAllInstances(@RequestBody Requestinformation requestinformation) {
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(requestinformation.getClientID()).get();
 			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			return creator.getAllInstances();
 		} catch (Exception e) {
@@ -156,26 +156,26 @@ public class Interface {
 		*/
 	}
 	
-	@PostMapping(path="/deleteEC2/{id}", consumes="application/json", produces="application/json")
-	public String deleteInstance(@PathVariable String id, @RequestBody Requestinformation instanceInformation) {
+	@PostMapping(path="/deleteEC2", consumes="application/json", produces="application/json")
+	public String deleteInstance(@RequestBody Requestinformation requestinformation) {
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(requestinformation.getClientID()).get();
 			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
-			return creator.deleteInstance(instanceInformation.getID());
+			return creator.deleteInstance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
 			return "User not found";
 		}
 	}
 
-	@PostMapping(path="/stopEC2/{id}", consumes="application/json", produces="application/json")
-	public String  stopInstance(@PathVariable String id, @RequestBody Requestinformation instanceInformation) {
+	@PostMapping(path="/stopEC2", consumes="application/json", produces="application/json")
+	public String  stopInstance(@RequestBody Requestinformation requestinformation) {
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(requestinformation.getClientID()).get();
 			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
-			return creator.stopInstance(instanceInformation.getID());
+			return creator.stopInstance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
 			return "User not found";
@@ -183,38 +183,38 @@ public class Interface {
 		
 	}
 
-	@PostMapping(path="/startEC2/{id}", consumes="application/json", produces="application/json")
-	public String startIntance(@PathVariable String id, @RequestBody Requestinformation instanceInformation) {
+	@PostMapping(path="/startEC2", consumes="application/json", produces="application/json")
+	public String startIntance(@RequestBody Requestinformation requestinformation) {
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(requestinformation.getClientID()).get();
 			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
-			return creator.startIntance(instanceInformation.getID());
+			return creator.startIntance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
 			return "User not found";
 		}
 	}
 
-	@PostMapping(path="/rebootEC2/{id}", consumes="application/json", produces="application/json")
-	public String rebootIntance(@PathVariable String id, @RequestBody Requestinformation instanceInformation) {
+	@PostMapping(path="/rebootEC2", consumes="application/json", produces="application/json")
+	public String rebootIntance(@RequestBody Requestinformation requestinformation) {
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(requestinformation.getClientID()).get();
 			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
-			return creator.rebootIntance(instanceInformation.getID());
+			return creator.rebootIntance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
 			return "User not found";
 		}		
 	}
 	
-	@PostMapping(path="/createBucket/{id}", consumes="application/json", produces="application/json")
-	public String createBucket(@PathVariable String id, @RequestBody S3Instance bucketInformation) {
+	@PostMapping(path="/createBucket", consumes="application/json", produces="application/json")
+	public String createBucket(@RequestBody S3Instance bucketInformation) {
 		JSONObject response = new JSONObject();
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(bucketInformation.getClientID()).get();
 			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			return creator.createBucket(bucketInformation.getBucketName());
 		} catch (Exception e) {
@@ -226,10 +226,10 @@ public class Interface {
 	}
 
 	@PostMapping(path="/getALLBuckets", produces="application/json")
-	public String listBuckets(@RequestBody Requestinformation instanceInformation) {
+	public String listBuckets(@RequestBody S3Instance bucketInformation) {
 		Client user = null;
 		try {
-			user = repository.findById(instanceInformation.getID()).get();
+			user = repository.findById(bucketInformation.getClientID()).get();
 			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			return creator.listBuckets();
 		} catch (Exception e) {
@@ -238,11 +238,11 @@ public class Interface {
 		}
 	}
 
-	@PostMapping(path="/deleteBucket/{id}", consumes="application/json", produces="application/json")
-	public String deleteBucket(@PathVariable String id, @RequestBody S3Instance bucketInformation) {
+	@PostMapping(path="/deleteBucket", consumes="application/json", produces="application/json")
+	public String deleteBucket(@RequestBody S3Instance bucketInformation) {
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(bucketInformation.getClientID()).get();
 			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			return creator.deleteBucket(bucketInformation.getBucketName());
 		} catch (Exception e) {
@@ -277,11 +277,11 @@ public class Interface {
 		
 	}
 
-	@PostMapping(path="/listObjects/{id}",consumes="application/json", produces="application/json")
-	public String listObjects(@PathVariable String id, @RequestBody S3Instance bucketInformation) {
+	@PostMapping(path="/listObjects",consumes="application/json", produces="application/json")
+	public String listObjects(@RequestBody S3Instance bucketInformation) {
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(bucketInformation.getClientID()).get();
 			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			return creator.listObjects(bucketInformation.getBucketName());
 		} catch (Exception e) {
@@ -290,12 +290,12 @@ public class Interface {
 		}
 	}
 
-	@PostMapping(path="/downloadObjects/{id}",consumes="application/json", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public @ResponseBody byte[] DownloadObject(@PathVariable String id, @RequestBody S3Instance bucketInformation) { //Path: "Document/hello.txt",
+	@PostMapping(path="/downloadObjects",consumes="application/json", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	public @ResponseBody byte[] DownloadObject(@RequestBody S3Instance bucketInformation) { //Path: "Document/hello.txt",
 		Client user = null;
 		InputStream in = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(bucketInformation.getClientID()).get();
 			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			in = creator.DownloadObject(bucketInformation.getBucketName(), bucketInformation.getPath());
 		} catch (Exception e) {
@@ -310,12 +310,12 @@ public class Interface {
 		return null;
 	}
 
-	@PostMapping(path="/deleteObject/{id}", consumes="application/json", produces="application/json")
-	public String deleteObject(@PathVariable String id, @RequestBody S3Instance bucketInformation) {
+	@PostMapping(path="/deleteObject", consumes="application/json", produces="application/json")
+	public String deleteObject(@RequestBody S3Instance bucketInformation) {
 
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(bucketInformation.getClientID()).get();
 			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			return creator.deleteObject(bucketInformation.getBucketName(), bucketInformation.getPath());
 		} catch (Exception e) {
@@ -324,11 +324,11 @@ public class Interface {
 		}		
 	}
 
-	@PostMapping(path="/deleteObjects/{id}", consumes="application/json", produces="application/json")
-	public String deleteMultipleObjects(@PathVariable String id, @RequestBody S3Instance bucketInformation) {
+	@PostMapping(path="/deleteObjects", consumes="application/json", produces="application/json")
+	public String deleteMultipleObjects(@RequestBody S3Instance bucketInformation) {
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(bucketInformation.getClientID()).get();
 			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			return creator.deleteMultipleObjects(bucketInformation.getBucketName(), bucketInformation.getObjkeyArr());
 		} catch (Exception e) {
@@ -338,11 +338,11 @@ public class Interface {
 	}
 	
 	
-	@PostMapping(path="/copyObject/{id}",consumes="application/json", produces="application/json")
-	public String CopyingRenamingMovingObject(@PathVariable String id, @RequestBody S3Instance bucketInformation) { //String sourceBucketName, String objectPathInSource, String destinationBucketName, String objectPathInDestination) {
+	@PostMapping(path="/copyObject",consumes="application/json", produces="application/json")
+	public String CopyingRenamingMovingObject(@RequestBody S3Instance bucketInformation) { //String sourceBucketName, String objectPathInSource, String destinationBucketName, String objectPathInDestination) {
 		Client user = null;
 		try {
-			user = repository.findById(id).get();
+			user = repository.findById(bucketInformation.getClientID()).get();
 			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
 			return creator.CopyObjects(bucketInformation.getSourceBucketName(), bucketInformation.getObjectPathInSource(), bucketInformation.getDestinationBucketName(), bucketInformation.getObjectPathInDestination());
 		} catch (Exception e) {

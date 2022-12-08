@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.amazonaws.AmazonServiceException;
@@ -57,12 +58,10 @@ public class S3BucketCreator {
 	public String listBuckets() {
 		//Source: https://www.baeldung.com/aws-s3-java
 		JSONObject instanceResponse = new JSONObject();
-		JSONObject JSONinstance = new JSONObject();
-		int counter = 1;
+		JSONArray JSONinstance = new JSONArray();
 		List<Bucket> buckets = s3.listBuckets();
 		for(Bucket bucket : buckets) {
-			JSONinstance.put("Bucketname" + counter, bucket.getName());
-			counter++;
+			JSONinstance.add(bucket.getName());
 		}
 		instanceResponse.put("Buckets", JSONinstance);
 		return instanceResponse.toJSONString();

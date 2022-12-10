@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -139,8 +140,7 @@ public class ContainerCreator {
 				.withMinCount(1)
 				.withMaxCount(1)
 				.withKeyName(keyName)
-				.withSecurityGroups("launch-wizard-1"); //change varible
-		System.out.println("instance created");
+				.withSecurityGroups(securityGroup); //change varible
 	
 		RunInstancesResult runInstancesResult = ec2.runInstances(runInstancesRequest);
 		
@@ -157,8 +157,7 @@ public class ContainerCreator {
 		String description = "Created by ContainorCreator";
 		String VpcID = getVPCID();
 		Boolean WebServer = webServerBoolean;
-		Boolean SSH = SSHBoolean;
-		
+		Boolean SSH = SSHBoolean;	
 		
 		//check if group name already exists
 		int counter = 1;
@@ -328,34 +327,59 @@ public class ContainerCreator {
 		//Source: https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/examples-ec2-instances.html
 		
 		JSONObject instanceResponse = new JSONObject();
-		boolean done = false;
-		int count = 0;
 		
-		DescribeInstancesRequest request = new DescribeInstancesRequest();
-		while(!done) {
-			JSONArray JSONarray = new JSONArray();
-		    DescribeInstancesResult response = ec2.describeInstances(request);
-		    
-		    for(Reservation reservation : response.getReservations()) {
-		    	JSONObject JSONinstance = new JSONObject();
-		        for(Instance instance : reservation.getInstances()) {        	
-		    		//instanceResponse.put("key", createKeyPairResult.getKeyPair().getKeyMaterial().toString() );		   
-		        	JSONinstance.put("ID", instance.getInstanceId().toString());
-		        	JSONinstance.put("AMI", instance.getImageId().toString());
-		        	JSONinstance.put("Type", instance.getInstanceType().toString());
-		        	JSONinstance.put("State", instance.getState().getName().toString());
-		        	JSONinstance.put("Monitoring State", instance.getMonitoring().getState().toString());
-		            count++;
+		JSONObject jsonObj = availabilityRegions();
+		JSONArray JSONarray = new JSONArray();
+		for (Object key : jsonObj.keySet()) {
+		        //based on you key types
+		        String keyStr = (String)key;
+		        JSONArray jsonArray = (JSONArray) jsonObj.get(keyStr);
+		        for (int i = 0; i < jsonArray.size(); i++) {
+		            JSONObject objects = (JSONObject) jsonArray.get(i);
+		            for(Object nestedKey : objects.keySet()) {
+		                String region = (String) objects.get(nestedKey.toString());
+		                AmazonEC2 ec2Region = AmazonEC2ClientBuilder
+		    					.standard()
+		    					.withCredentials(new AWSStaticCredentialsProvider(credentials))
+		    	            	.withRegion(region)
+		    					.build();
+		                
+		                DescribeInstancesRequest request = new DescribeInstancesRequest();
+		                boolean done = false;
+		                
+		        		while(!done) {		        			
+		        		    DescribeInstancesResult response = ec2Region.describeInstances(request);
+		        		    for(Reservation reservation : response.getReservations()) {
+		        		    	JSONObject JSONinstance = new JSONObject();
+		        		        for(Instance instance : reservation.getInstances()) {        	
+		        		    		//instanceResponse.put("key", createKeyPairResult.getKeyPair().getKeyMaterial().toString() );		   
+		        		        	JSONinstance.put("ID", instance.getInstanceId().toString());
+		        		        	JSONinstance.put("Region", region);
+		        		        	JSONinstance.put("AMI", instance.getImageId().toString());
+		        		        	JSONinstance.put("Type", instance.getInstanceType().toString());
+		        		        	JSONinstance.put("State", instance.getState().getName().toString());
+		        		        	JSONinstance.put("Monitoring State", instance.getMonitoring().getState().toString());
+		        		        	
+		        		        }
+		        		        System.out.println(JSONinstance.toJSONString());
+		        		        JSONarray.add(JSONinstance);		        		        
+		        		    }
+		        		    
+		        		 
+		        		    request.setNextToken(response.getNextToken());
+		        	
+		        		    if(response.getNextToken() == null) {
+		        		        done = true;
+		        		    }
+		            }
+
 		        }
-		        JSONarray.add(JSONinstance);
-		    }
-		    instanceResponse.put("Instances",JSONarray);
-		    request.setNextToken(response.getNextToken());
-	
-		    if(response.getNextToken() == null) {
-		        done = true;
+		            
 		    }
 		}
+		
+		
+		 instanceResponse.put("Instances",JSONarray);
 		return instanceResponse.toJSONString();
 		
 	}
@@ -404,7 +428,7 @@ public class ContainerCreator {
 		return instanceResponse.toJSONString();	
 	}
 	
-	public String availabilityRegions() {
+	public JSONObject availabilityRegions() {
 		JSONObject instanceResponse = new JSONObject();
 
 		DescribeRegionsResult regions_response = ec2.describeRegions();
@@ -416,7 +440,7 @@ public class ContainerCreator {
 		    
 		}
 		instanceResponse.put("Regions",JSONarray);
-		return instanceResponse.toJSONString();
+		return instanceResponse;
 	}
 	
 }

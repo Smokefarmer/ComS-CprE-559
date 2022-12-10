@@ -66,17 +66,7 @@ public class Interface {
 	public String index() {
 		return "Greetings from Container Creator!";
 	}
-	
-	@GetMapping("/user/{id}")
-	public String getClient(@PathVariable String id) {
-		try {
-			return repository.findById(id).get().toString();
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		return "User not found";
-	}
-	
+		
 	@PostMapping(path="/login", consumes="application/json", produces="application/json")
 	public String EC2Creator(@RequestBody CCCredentials credentials) { //Region example: us-east-2
 		JSONObject response = new JSONObject();
@@ -89,6 +79,8 @@ public class Interface {
 
 		if(repository.findById(ID).isEmpty()) {
 			try {
+				ContainerCreator testCreator = new ContainerCreator(newUser.getAwsAccessKeyId(), newUser.getAwsSecretAccessKey(), newUser.getRegion());
+				testCreator.getAllInstances();
 				repository.save(newUser);
 			} catch (Exception e) {
 				System.out.println(e.toString());

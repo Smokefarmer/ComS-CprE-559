@@ -10,7 +10,9 @@ public class Requestinformation {
 	private String instanceTyp;
 	private Boolean WebServer;
 	private Boolean SSH;
-	public Requestinformation(String ClientID, String ID, String keyName, String securityGroupName, String ImageID, String instanceTyp,
+	private String Region;
+	
+	public Requestinformation(String Region, String ClientID, String ID, String keyName, String securityGroupName, String ImageID, String instanceTyp,
 			Boolean WebServer, Boolean SSH) {
 		this.ClientID = ClientID;
 		this.ID = ID;
@@ -20,9 +22,14 @@ public class Requestinformation {
 		this.instanceTyp = instanceTyp;
 		this.WebServer = WebServer;
 		this.SSH = SSH;
+		this.Region = Region;
 	}
 	public String getID() {
 		return ID;
+	}
+	
+	public String getRegion() {
+		return Region;
 	}
 	
 	public String getClientID() {

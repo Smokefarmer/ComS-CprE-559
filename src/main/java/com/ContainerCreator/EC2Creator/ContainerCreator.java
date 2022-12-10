@@ -7,6 +7,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2ClientBuilder;
+import com.amazonaws.services.ec2.model.DescribeRegionsResult;
+import com.amazonaws.services.ec2.model.Region;
+import com.amazonaws.services.ec2.model.AvailabilityZone;
+import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
 import com.ContainerCreator.JSONObjects.Requestinformation;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
@@ -44,6 +51,7 @@ import com.amazonaws.services.ec2.model.CreateSecurityGroupRequest;
 import com.amazonaws.services.ec2.model.CreateSecurityGroupResult;
 import com.amazonaws.services.ec2.model.DeleteSecurityGroupRequest;
 import com.amazonaws.services.ec2.model.DeleteSecurityGroupResult;
+import com.amazonaws.services.ec2.model.DescribeAvailabilityZonesResult;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesResult;
 import com.amazonaws.services.ec2.model.DescribeKeyPairsResult;
@@ -395,6 +403,20 @@ public class ContainerCreator {
 		instanceResponse.put("Stop", "True");
 		return instanceResponse.toJSONString();	
 	}
+	
+	public String availabilityRegions() {
+		JSONObject instanceResponse = new JSONObject();
 
+		DescribeRegionsResult regions_response = ec2.describeRegions();
+		JSONArray JSONarray = new JSONArray();
+		for(Region region : regions_response.getRegions()) {
+			JSONObject JSONinstance = new JSONObject();
+        	JSONinstance.put("Region", region.getRegionName().toString());
+        	JSONarray.add(JSONinstance);
+		    
+		}
+		instanceResponse.put("Regions",JSONarray);
+		return instanceResponse.toJSONString();
+	}
 	
 }

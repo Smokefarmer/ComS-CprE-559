@@ -93,6 +93,21 @@ public class Interface {
 		return response.toString();
 	}
 	
+	@PostMapping(path="/availabilityRegions", consumes="application/json", produces="application/json")
+	public String availabilityRegions(@RequestBody Requestinformation requestinformation) { 
+		JSONObject response = new JSONObject();
+		Client user = null;
+		try {
+			user = repository.findById(requestinformation.getClientID()).get();
+			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			return creator.availabilityRegions();
+		} catch (Exception e) {
+			System.out.println(e);
+			response.put("Error", e.toString());
+			return response.toString();
+		}
+	}
+	
 	@PostMapping(path="/createEC2", consumes="application/json", produces="application/json")
 	public String CreateEC2(@RequestBody Requestinformation requestinformation) { 
 		JSONObject response = new JSONObject();

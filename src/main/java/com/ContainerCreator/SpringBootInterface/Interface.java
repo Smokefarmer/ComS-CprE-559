@@ -9,6 +9,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.crypto.spec.SecretKeySpec;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -55,7 +57,8 @@ import com.ContainerCreator.S3Ceator.S3BucketCreator;
 @RestController
 @CrossOrigin
 public class Interface {
-
+	
+	private AES AES = new AES();
 	private UserRepository repository;
 
 	Interface(UserRepository repository) {
@@ -68,26 +71,29 @@ public class Interface {
 	}
 		
 	@PostMapping(path="/login", consumes="application/json", produces="application/json")
-	public String EC2Creator(@RequestBody CCCredentials credentials) { //Region example: us-east-2
+	public String EC2Creator(@RequestBody CCCredentials credentials) {
 		JSONObject response = new JSONObject();
-		
-		SHAHash Hash = new SHAHash();
-		String ID = Hash.generateSHAHash(credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
-		Client newUser = new Client(ID,credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
-		
-		
+		String ID = null;
+		Client newUser = null;
+		try {
+			SHAHash Hash = new SHAHash();
+			ID = Hash.generateSHAHash(credentials.getAwsAccessKeyId(), credentials.getAwsSecretAccessKey(), credentials.getRegion());
+			newUser = new Client(ID, AES.encrypt(credentials.getAwsAccessKeyId(), ID), AES.encrypt(credentials.getAwsSecretAccessKey(), ID), credentials.getRegion());
+
+		} catch (Exception e){
+			System.out.println(e.toString());
+		}
 
 		if(repository.findById(ID).isEmpty()) {
 			try {
-				ContainerCreator testCreator = new ContainerCreator(newUser.getAwsAccessKeyId(), newUser.getAwsSecretAccessKey(), newUser.getRegion());
-				testCreator.getAllInstances();
+				ContainerCreator testCreator = new ContainerCreator(AES.decrypt(newUser.getAwsAccessKeyId(),ID), AES.decrypt(newUser.getAwsSecretAccessKey(),ID), newUser.getRegion());
+				testCreator.availabilityRegions();
 				repository.save(newUser);
 			} catch (Exception e) {
 				System.out.println(e.toString());
 				response.put("Error", e.toString());
 				return response.toString();
 			}
-			
 		}
 		response.put("id", ID);
 		return response.toString();
@@ -99,7 +105,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			ContainerCreator creator = new ContainerCreator( AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), user.getRegion());
 			return creator.availabilityRegions().toJSONString();
 		} catch (Exception e) {
 			System.out.println(e);
@@ -114,7 +120,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), requestinformation.getRegion());
+			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), requestinformation.getRegion());
 			return creator.createEC2(requestinformation);
 		} catch (Exception e) {
 			System.out.println(e);
@@ -122,28 +128,7 @@ public class Interface {
 			return response.toString();
 		}
 		
-		/*
-		 * case "Amazonlinux": {
-			ImageID = "ami-089a545a9ed9893b6";
-			ami-0beaa649c482330f7
-			ami-0b0dcb5067f052a63
-		}
-		case "Ubuntu": {
-			ImageID = "ami-097a2df4ac947655f";
-		}
-		case "Windows": {
-			ImageID = "ami-06013f13f176912f5";
-		}
-		case "Red Hat": {
-			ImageID = "ami-08d616b7fbe4bb9d0";
-		}
-		case "SUSE Linux": {
-			ImageID = "ami-0535d9b70179f9734";
-		}
-		case "Debian": {
-			ImageID = "ami-0c7c4e3c6b4941f0f";
-		}
-		 */
+		
 	}
 	
 	@PostMapping(path="/getALLInstances", produces="application/json")
@@ -151,20 +136,13 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), user.getRegion());
 			return creator.getAllInstances();
 		} catch (Exception e) {
 			System.out.println(e);
 			return "User not found";
 		}
-		/*
-		Found instance with 
-		id just name
-		AMI just operation system
-		type large, medium, small
-		state running, stopped or deleted
-		and monitoring state
-		*/
+		
 	}
 	
 	@PostMapping(path="/deleteEC2", consumes="application/json", produces="application/json")
@@ -172,7 +150,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), requestinformation.getRegion());
+			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), requestinformation.getRegion());
 			return creator.deleteInstance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -185,7 +163,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), requestinformation.getRegion());
+			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), requestinformation.getRegion());
 			return creator.stopInstance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -199,7 +177,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), requestinformation.getRegion());
+			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), requestinformation.getRegion());
 			return creator.startIntance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -212,7 +190,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), requestinformation.getRegion());
+			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), requestinformation.getRegion());
 			return creator.rebootIntance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -226,7 +204,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(bucketInformation.getClientID()).get();
-			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			S3BucketCreator creator = new S3BucketCreator(AES.decrypt( user.getAwsAccessKeyId(), bucketInformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), bucketInformation.getClientID()), user.getRegion());
 			return creator.createBucket(bucketInformation.getBucketName());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -241,7 +219,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(bucketInformation.getClientID()).get();
-			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			S3BucketCreator creator = new S3BucketCreator(AES.decrypt( user.getAwsAccessKeyId(), bucketInformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), bucketInformation.getClientID()), user.getRegion());
 			return creator.listBuckets();
 		} catch (Exception e) {
 			System.out.println(e);
@@ -254,7 +232,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(bucketInformation.getClientID()).get();
-			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			S3BucketCreator creator = new S3BucketCreator(AES.decrypt( user.getAwsAccessKeyId(), bucketInformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), bucketInformation.getClientID()), user.getRegion());
 			return creator.deleteBucket(bucketInformation.getBucketName());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -273,14 +251,14 @@ public class Interface {
 			outStream.write(buffer);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.toString());
 		}
 		
 		Client user = null;
 		try {
 			user = repository.findById(id).get();
-			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
-			return creator.uploadObject(bucketname,file.getOriginalFilename(), uploadfile); //String bucketName, String Path, File file
+			S3BucketCreator creator = new S3BucketCreator(AES.decrypt( user.getAwsAccessKeyId(), id), AES.decrypt(user.getAwsSecretAccessKey(),id), user.getRegion());
+			return creator.uploadObject(bucketname,file.getOriginalFilename(), uploadfile);
 		} catch (Exception e) {
 			System.out.println(e);
 			return e.toString();
@@ -293,7 +271,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(bucketInformation.getClientID()).get();
-			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			S3BucketCreator creator = new S3BucketCreator(AES.decrypt( user.getAwsAccessKeyId(), bucketInformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), bucketInformation.getClientID()), user.getRegion());
 			return creator.listObjects(bucketInformation.getBucketName());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -307,7 +285,7 @@ public class Interface {
 		InputStream in = null;
 		try {
 			user = repository.findById(bucketInformation.getClientID()).get();
-			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			S3BucketCreator creator = new S3BucketCreator(AES.decrypt( user.getAwsAccessKeyId(), bucketInformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), bucketInformation.getClientID()), user.getRegion());
 			in = creator.DownloadObject(bucketInformation.getBucketName(), bucketInformation.getPath());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -327,7 +305,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(bucketInformation.getClientID()).get();
-			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			S3BucketCreator creator = new S3BucketCreator(AES.decrypt( user.getAwsAccessKeyId(), bucketInformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), bucketInformation.getClientID()), user.getRegion());
 			return creator.deleteObject(bucketInformation.getBucketName(), bucketInformation.getPath());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -340,7 +318,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(bucketInformation.getClientID()).get();
-			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			S3BucketCreator creator = new S3BucketCreator(AES.decrypt( user.getAwsAccessKeyId(), bucketInformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), bucketInformation.getClientID()), user.getRegion());
 			return creator.deleteMultipleObjects(bucketInformation.getBucketName(), bucketInformation.getObjkeyArr());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -354,7 +332,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(bucketInformation.getClientID()).get();
-			S3BucketCreator creator = new S3BucketCreator(user.getAwsAccessKeyId(), user.getAwsSecretAccessKey(), user.getRegion());
+			S3BucketCreator creator = new S3BucketCreator(AES.decrypt( user.getAwsAccessKeyId(), bucketInformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), bucketInformation.getClientID()), user.getRegion());
 			return creator.CopyObjects(bucketInformation.getSourceBucketName(), bucketInformation.getObjectPathInSource(), bucketInformation.getDestinationBucketName(), bucketInformation.getObjectPathInDestination());
 		} catch (Exception e) {
 			System.out.println(e);

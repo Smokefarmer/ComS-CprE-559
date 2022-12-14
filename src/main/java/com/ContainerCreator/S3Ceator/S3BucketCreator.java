@@ -45,7 +45,7 @@ public class S3BucketCreator {
 		if(s3.doesBucketExistV2(bucketName)) {
 			System.out.println("Bucket name is not available."
 		      + " Try again with a different Bucket name.");
-			instanceResponse.put("Request", "False");
+			instanceResponse.put("Request", "Bucket name is not available. " + bucketName + " Try again with a different Bucket name.");
 			return instanceResponse.toJSONString();
 		}
 	

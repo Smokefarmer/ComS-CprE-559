@@ -78,7 +78,7 @@ public class ContainerCreator {
 			 // Your accesskey and secretkey
 			credentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretAccessKey);
 						
-			
+			System.out.println(credentials.getAWSAccessKeyId() + "\n");
 			
 			 //Set up the amazon ec2 client 
 			ec2 = AmazonEC2ClientBuilder
@@ -88,10 +88,7 @@ public class ContainerCreator {
 					.build();
 			
 			} catch (Exception e) {
-			throw new AmazonClientException(
-			"Cannot load the credentials from the credential profiles file. " +
-			"Please make sure that your credentials file is at the correct " +
-			"location (/Users/wzhang/.aws/credentials), and is in valid format.", e);
+			throw new AmazonClientException(e);
 			}
 	}
 

@@ -167,6 +167,7 @@ public class Interface {
 			return creator.stopInstance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
+			System.out.println(e.toString());
 			return "User not found";
 		}
 		

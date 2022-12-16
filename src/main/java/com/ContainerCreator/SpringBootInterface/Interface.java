@@ -150,7 +150,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), requestinformation.getRegion());
+			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), user.getRegion());
 			return creator.deleteInstance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -163,7 +163,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), requestinformation.getRegion());
+			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), user.getRegion());
 			return creator.stopInstance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -178,7 +178,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), requestinformation.getRegion());
+			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), user.getRegion());
 			return creator.startIntance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);
@@ -191,7 +191,7 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), requestinformation.getRegion());
+			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), user.getRegion());
 			return creator.rebootIntance(requestinformation.getID());
 		} catch (Exception e) {
 			System.out.println(e);

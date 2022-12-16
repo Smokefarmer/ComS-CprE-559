@@ -77,9 +77,7 @@ public class ContainerCreator {
 			
 			 // Your accesskey and secretkey
 			credentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretAccessKey);
-						
-			System.out.println(credentials.getAWSAccessKeyId() + "\n");
-			
+									
 			 //Set up the amazon ec2 client 
 			ec2 = AmazonEC2ClientBuilder
 					.standard()

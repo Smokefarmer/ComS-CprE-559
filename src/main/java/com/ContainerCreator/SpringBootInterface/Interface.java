@@ -163,8 +163,10 @@ public class Interface {
 		Client user = null;
 		try {
 			user = repository.findById(requestinformation.getClientID()).get();
-			System.out.printf(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()));
-			System.out.printf(AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()));
+			System.out.printf(user.getAwsAccessKeyId()+"\n");
+			System.out.printf(requestinformation.getClientID()+"\n");
+			System.out.printf(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID())+"\n");
+			System.out.printf(AES.decrypt( user.getAwsSecretAccessKey(), requestinformation.getClientID()));
 
 			ContainerCreator creator = new ContainerCreator(AES.decrypt( user.getAwsAccessKeyId(), requestinformation.getClientID()), AES.decrypt(user.getAwsSecretAccessKey(), requestinformation.getClientID()), requestinformation.getRegion());
 			return creator.stopInstance(requestinformation.getID());
